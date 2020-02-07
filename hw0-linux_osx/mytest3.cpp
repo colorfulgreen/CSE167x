@@ -188,7 +188,7 @@ void display(void)
 	glUniform3f(colorPos, 0.0f, 1.0f, 1.0f);
 	//  ** NEW ** Put a teapot in the middle that animates
 	pushMatrix(modelview);
-	modelview = modelview * glm::translate(identity, glm::vec3(teapotloc, 0.0, 0.0));
+	modelview = modelview * glm::translate(identity, glm::vec3(teapotloc, 0.0, 0.0));  // Y=0, Z=0, to animate from left to right 
 
 	//  The following two transforms set up and center the teapot
 	//  Remember that transforms right-multiply the modelview matrix (top of the stack)
@@ -443,7 +443,7 @@ void init (void)
 	inittexture("wood.ppm", shaderprogram) ; 
 
 	// Initialize objects
-	initobject(FLOOR, (GLfloat *)floorverts, sizeof(floorverts), (GLfloat *)floorcol, sizeof(floorcol), (GLubyte *)floorinds, sizeof(floorinds), GL_TRIANGLES);
+	initobject(FLOOR, (GLfloat *)floorverts, sizeof(floorverts), (GLfloat *)floorcol, sizeof(floorcol), (GLubyte *)floorinds, sizeof(floorinds), GL_TRIANGLES); // init floor
 	initcubes(CUBE, (GLfloat *)cubeverts, sizeof(cubeverts), (GLubyte *)cubeinds, sizeof(cubeinds), GL_TRIANGLES);
 	loadteapot();
 

@@ -145,9 +145,9 @@ void inittexture (const char * filename, GLuint program) {
 
 // This function initializes a bunch of color cubes
 void initcubes(GLuint object, GLfloat * vert, GLint sizevert, GLubyte * inds, GLint sizeind, GLenum type) {
-	for (int i = 0; i < ncolors; i++) {
-		for (int j = 0; j < 8; j++)
-			for (int k = 0; k < 3; k++)
+	for (int i = 0; i < ncolors; i++) {  // ncolors=4, 4 cubes
+		for (int j = 0; j < 8; j++)      // 8 vertex per cube
+			for (int k = 0; k < 3; k++)  // RGB color
 				cubecol[j][k] = _cubecol[i][k];
 		glBindVertexArray(VAOs[object + i]);
 		int offset = object * numperobj;
