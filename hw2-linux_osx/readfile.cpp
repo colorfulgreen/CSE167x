@@ -92,7 +92,7 @@ void readfile(const char* filename)
         // Ruled out comment and blank lines 
 
         stringstream s(str);
-        s >> cmd; 
+        s >> cmd;  // NOTE skipping preceding whitespace
         int i; 
         GLfloat values[10]; // Position and color for light, colors for others
         // Up to 10 params for cameras.  
@@ -111,6 +111,10 @@ void readfile(const char* filename)
               // Note that values[0...7] shows the read in values 
               // Make use of lightposn[] and lightcolor[] arrays in variables.h
               // Those arrays can then be used in display too.  
+              for(i = 0; i < 4; i++) {
+                  lightposn[4*numused + i] = values[i];
+                  lightcolor[4*numused + i] = values[4+i];
+              }
 
               ++numused; 
             }
@@ -170,6 +174,14 @@ void readfile(const char* filename)
             // You may need to use the upvector fn in Transform.cpp
             // to set up correctly. 
             // Set eyeinit upinit center fovy in variables.h 
+            eyeinit = vec3(values[0], values[1], values[2]);
+            center = vec3(values[3], values[4], values[5]);
+            fovy = values[9];
+
+            // TODO Create a coordinate frame for the camera
+            vec3 up = glm::normalize(vec3(values[6], values[7], values[8]));
+            vec3 direction = center - eyeinit;
+            upinit = Transform::upvector(upinit, direction);
 
           }
         }
@@ -186,6 +198,7 @@ void readfile(const char* filename)
               object * obj = &(objects[numobjects]); 
               obj->size = values[0]; 
 
+              // TODO demo.txt 中有的 ambient 在 teapot 之后定义，如何关联？
               // Set the object's light properties
               for (i = 0; i < 4; i++) {
                 (obj->ambient)[i] = ambient[i]; 
@@ -195,6 +208,7 @@ void readfile(const char* filename)
               }
               obj->shininess = shininess; 
 
+              // TODO transfstack ?
               // Set the object's transform
               obj->transform = transfstack.top(); 
 
@@ -219,7 +233,8 @@ void readfile(const char* filename)
             // Think about how the transformation stack is affected
             // You might want to use helper functions on top of file. 
             // Also keep in mind what order your matrix is!
-
+            mat4 M = Transform::translate(values[0], values[1], values[2]);
+            rightmultiply(M, transfstack); 
           }
         }
         else if (cmd == "scale") {
@@ -230,7 +245,8 @@ void readfile(const char* filename)
             // Think about how the transformation stack is affected
             // You might want to use helper functions on top of file.  
             // Also keep in mind what order your matrix is!
-
+            mat4 M = Transform::scale(values[0], values[1], values[2]);
+            rightmultiply(M, transfstack); 
           }
         }
         else if (cmd == "rotate") {
@@ -243,7 +259,11 @@ void readfile(const char* filename)
             // See how the stack is affected, as above.  
             // Note that rotate returns a mat3. 
             // Also keep in mind what order your matrix is!
-
+            vec3 axis = vec3(values[0], values[1], values[2]);
+            float degrees = values[3];
+            mat3 M = Transform::rotate(degrees, axis);
+            // TODO how to expand mat3 to mat4 ?
+            rightmultiply(mat4(M), transfstack);
           }
         }
 

@@ -54,6 +54,11 @@ void display()
   } else {
     modelview = Transform::lookAt(eye,center,up); 
   }
+	// NOTE glUniform — Specify the value of a uniform variable for the current program object.
+	// 可以理解成给 shader 中 uniform 变量发送数据.
+	// location: the location of the uniform variable to be modified.
+	// count: the number of matrices to be passed.
+	// transpose: GL_FALSE, each matrix is assumed to be supplied in column major order.
   glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 
   // Lights are transformed by current modelview matrix. 
@@ -66,7 +71,13 @@ void display()
     // You need to pass the light positions and colors to the shader. 
     // glUniform4fv() and similar functions will be useful. See FAQ for help with these functions.
     // The lightransf[] array in variables.h and transformvec() might also be useful here.
-    // Remember that light positions must be transformed by modelview.  
+    // Remember that light positions must be transformed by modelview. 
+		for(int i = 0; i < numused; i++)
+      transformvec(&lightposn[i*4], &lightransf[i*4]);
+    // TODO numusedcol ? 
+    glUniform1i(numusedcol, numused);
+		glUniform4fv(lightpos, numused, lightransf);
+		glUniform4fv(lightcol, numused, lightcolor);
 
   } else {
     glUniform1i(enablelighting,false); 
@@ -81,8 +92,10 @@ void display()
   // You need to use scale, translate and modelview to 
   // set up the net transformation matrix for the objects.  
   // Account for GLM issues, matrix order, etc.  
+  transf = modelview * tr * sc;
 
-  
+ 
+  // TODO why to modify the top of the stack ?
   // The object draw functions will need to further modify the top of the stack,
   // so assign whatever transformation matrix you intend to work with to modelview
   // rather than use a uniform variable for that.
@@ -95,7 +108,12 @@ void display()
     // Set up the object transformations 
     // And pass in the appropriate material properties
     // Again glUniform() related functions will be useful
-
+    modelview = transf * obj->transform;
+    glUniform4fv(ambientcol, 1, obj->ambient);
+    glUniform4fv(diffusecol, 1, obj->diffuse);
+    glUniform4fv(specularcol, 1, obj->specular);
+    // glUniform4fv(emissioncol, 1, obj->emission); // TODO should emission be set?
+    glUniform1fv(shininesscol, 1, &obj->shininess);
 
     // Actually draw the object
     // We provide the actual drawing functions for you.  

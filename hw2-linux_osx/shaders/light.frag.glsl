@@ -34,6 +34,18 @@ uniform vec4 specular;
 uniform vec4 emission; 
 uniform float shininess; 
 
+vec4 ComputeLight (vec3 direction, vec4 lightcolor, vec3 normal, vec3 halfvec, vec4 mydiffuse, vec4 myspecular, float myshininess) {
+    
+    float nDotL = dot(normal, direction)  ;
+    vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;
+    
+    float nDotH = dot(normal, halfvec) ;
+    vec4 phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ;
+    
+    vec4 retval = lambert + phong ;
+    return retval ;
+}
+
 void main (void) 
 {       
     if (enablelighting) {       
@@ -41,9 +53,37 @@ void main (void)
 
         // YOUR CODE FOR HW 2 HERE
         // A key part is implementation of the fragment shader
+        // TODO
+
+        const vec3 eyepos = vec3(0, 0, 0);      // The eye is always at (0,0,0), looking down -z axis
+        vec3 mypos = myvertex.xyz / myvertex.w; // Dehomogenize
+        vec3 eyedirn = normalize(eyepos - mypos);
+
+        vec3 normal = mat3(transpose(inverse(modelview))) * mynormal;
+        normal = normalize(normal);
+
+        vec4 allColors = vec4(0,0,0,0);
+        for (int i = 0 ; i < numused ; i++) {
+            // Light
+            //vec3 position0 = light0posn.xyz / light0posn.w ;
+            vec3 position0;
+            vec3 direction0;
+            if(lightposn[i].w != 0){
+                position0 = lightposn[i].xyz / lightposn[i].w ;
+                direction0 = normalize (position0 - mypos) ;
+            }else{
+                
+                direction0 = normalize(lightposn[i].xyz);
+            }
+            vec3 half0 = normalize (direction0 + eyedirn) ;
+            vec4 col0 = ComputeLight(direction0, lightcolor[i], normal, half0, diffuse, specular, shininess);
+            allColors += col0;
+        }
+
 
         // Color all pixels black for now, remove this in your implementation!
-        finalcolor = vec4(0.0f, 0.0f, 0.0f, 1.0f); 
+        // finalcolor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        finalcolor = ambient + allColors;
 
         fragColor = finalcolor; 
     } else {

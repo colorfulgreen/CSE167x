@@ -33,7 +33,6 @@ void Transform::left(float degrees, vec3& eye, vec3& up) {
 
     mat3 rotationMatrix = rotate(-degrees, up);
     eye = rotationMatrix * eye;
-    up = rotationMatrix * up;
 
     printf("Coordinates: %.2f, %.2f, %.2f; distance: %.2f\n", eye.x, eye.y, eye.z, sqrt(pow(eye.x, 2) + pow(eye.y, 2) + pow(eye.z, 2)));
 
