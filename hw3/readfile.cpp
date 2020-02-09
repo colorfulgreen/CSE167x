@@ -54,11 +54,11 @@ void readfile(const char* filename, Scene *scene)
                 float values[10];
                 bool validinput;
                 float diffuse[3];
-                float shininess;
                 float specular[3];
-                int max_vertices;
                 float ambient[3];
                 float emission[3];
+                float shininess;
+                int max_vertices;
                 
                 
                 if (cmd == "size") {
@@ -72,11 +72,13 @@ void readfile(const char* filename, Scene *scene)
                     if (validinput){
                         vec3 lookFrom = vec3(values[0], values[1], values[2]);
                         vec3 lookAt = vec3(values[3], values[4], values[5]);
+                        vec3 up = vec3(values[6], values[7], values[8]);
+
                         scene->camera->lookFrom = lookFrom;
                         scene->camera->lookAt = lookAt;
                         scene->camera->fovy = values[9];
                         vec3 zvec = lookFrom - lookAt;
-                        scene->camera->up = Transform::upvector(vec3(values[6], values[7], values[8]), zvec);
+                        scene->camera->up = Transform::upvector(up, zvec);
                         
                         scene->camera->setCoord();
                     }
@@ -103,32 +105,19 @@ void readfile(const char* filename, Scene *scene)
                     emission[2] = values[2];
                     
                 }
-                else if (cmd == "sphere"){
-                    if (scene->num_objects < max_objects){
+                else if (cmd == "sphere" || cmd == "tri"){
+                    if (scene->num_objects == max_objects) {
+                      cerr << "Reached Maximum Number of Objects " << scene->num_objects << " Will ignore further objects\n";
+                    } else {
+                      if (cmd == "sphere") {
                         validinput = readvals(s, 4, values);
                         scene->shapes[scene->num_objects] = new Sphere(vec3(values[0], values[1], values[2]), values[3]);
-                        // set material
-                        scene->shapes[scene->num_objects]->set_diffuse(diffuse);
-                        scene->shapes[scene->num_objects]->set_shininess(shininess);
-                        scene->shapes[scene->num_objects]->set_specular(specular);
-                        scene->shapes[scene->num_objects]->set_ambient(ambient);
-                        scene->shapes[scene->num_objects]->set_emission(emission);
-                        // set transform
-                        scene->shapes[scene->num_objects]->set_transform(transfstack.top());
-                        scene->num_objects += 1;
-                    }else{
-                        printf("max number of objects reached\n");
-                    }
-                    
-                }
-                else if (cmd == "tri"){
-                    if (scene->num_objects >= max_objects){
-                        printf("max number of objects reached\n");
-                    }else{
+                      } else if (cmd == "tri") {
                         validinput = readvals(s, 3, values);
                         scene->shapes[scene->num_objects] = new Triangle(scene->vertices[(int)values[0]],
                                                                          scene->vertices[(int)values[1]],
                                                                          scene->vertices[(int)values[2]]);
+                      }
                         // set material
                         scene->shapes[scene->num_objects]->set_diffuse(diffuse);
                         scene->shapes[scene->num_objects]->set_shininess(shininess);
@@ -138,9 +127,8 @@ void readfile(const char* filename, Scene *scene)
                         // set transform
                         scene->shapes[scene->num_objects]->set_transform(transfstack.top());
                         scene->num_objects += 1;
-                    }
+                    }                    
                 }
-                
                 else if (cmd == "ambient"){
                     validinput = readvals(s, 3, values);
                     ambient[0] = values[0];
@@ -186,13 +174,8 @@ void readfile(const char* filename, Scene *scene)
                 else if (cmd == "translate") {
                     validinput = readvals(s,3,values);
                     if (validinput) {
-                        glm::mat4 translate_m = glm::mat4(1,0,0,0,
-                                                0,1,0,0,
-                                                0,0,1,0,
-                                                values[0], values[1], values[2], 1);
-                        
+                        glm::mat4 translate_m = Transform::translate(values[0], values[1], values[2]);
                         rightmultiply(translate_m, transfstack);
-                    
                     }
                 }
                 
@@ -204,16 +187,8 @@ void readfile(const char* filename, Scene *scene)
                 else if (cmd == "rotate") {
                     validinput = readvals(s,4,values);
                     if (validinput) {
-                        
                         mat3 r = Transform::rotate(values[3], vec3(values[0], values[1], values[2]));
-                        
-                        mat4 rotate_m4 = mat4(r[0][0],r[1][0],r[2][0],0,
-                                              r[0][1],r[1][1],r[2][1],0,
-                                              r[0][2],r[1][2],r[2][2],0,
-                                              0,0,0,1);
-                        
-                        rightmultiply(rotate_m4, transfstack);
-                        
+                        rightmultiply(mat4(r), transfstack);
                     }
                 }
                 
@@ -234,13 +209,8 @@ void readfile(const char* filename, Scene *scene)
                 
                 else if (cmd == "attenuation"){
                     validinput = readvals(s, 3, values);
-                    float _a[3] = {1,0,0};
-                    _a[0] = values[0];
-                    _a[1] = values[1];
-                    _a[2] = values[2];
-                    
+                    float _a[3] = {values[0],values[1],values[2]};
                     scene->set_attenuation(_a);
-
                 }
 
             }
