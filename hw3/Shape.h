@@ -125,7 +125,7 @@ public:
 class Intersection{
 public:
     LocalGeo *localGeo = new LocalGeo(Point(), Normal());
-    Shape * shape = new Sphere();
+    Shape *shape = new Sphere();
     Intersection(){};
 };
 

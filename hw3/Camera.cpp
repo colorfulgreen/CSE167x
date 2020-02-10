@@ -9,12 +9,8 @@ void Camera::generateRay(Sample &sample, Ray *ray, Film &film){
     
     float tan_fovx_2 = (float) film.w / film.h * tanf(glm::radians(fovy) / 2);
     float alpha = tan_fovx_2 * (sample.x - film.w/2) / (film.w/2);
-    
-    vec3 dirn = vec3(
-                     alpha * u.x + beta * v.x - w.x,
-                     alpha * u.y + beta * v.y - w.y,
-                     alpha * u.z + beta * v.z - w.z);
-    
+
+    vec3 dirn = alpha * u + beta * v - w;
     *ray = Ray(vec4(lookFrom,1), glm::normalize(vec4(dirn,0)), ray->t, ray->t_min, ray->t_max);
     
 }

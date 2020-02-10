@@ -125,18 +125,18 @@ bool Triangle::intersectP(Ray &ray){
 }
 
 bool Triangle::intersect(Ray &ray, float *thit, LocalGeo *local){
-    
     mat4 invTransform = glm::inverse(transform);
 
     Ray rayTransformed = Ray(invTransform * ray.pos, invTransform*ray.dir, ray.t, ray.t_min, ray.t_max);
     
+    // 求光线与三角形所在平面的交点
     // A B C clockwise: C = vert1, B = vert2, A = vert3
     // t = (A dot n - Ray.pos dot n) / (Ray.dir dot n)
     setNormal();
     float t = (glm::dot(vec4(vert3,1), vec4(normal,1)) - glm::dot(rayTransformed.pos, vec4(normal,1))) / (glm::dot(rayTransformed.dir, vec4(normal,1)));
-
     vec4 rayP = rayTransformed.pos + t * rayTransformed.dir;
-    
+   
+    // 检查交点是否在三角形内部
     // 0 <= beta <= 1; 0 <= gamma <= 1; beta + gamma <= 1
     float alpha, beta, gamma;
     baryCentric(rayP, alpha, beta, gamma);

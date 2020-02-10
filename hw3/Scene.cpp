@@ -113,7 +113,7 @@ void Scene::rayTrace(Ray &ray, int depth, Color *color) {
         *color = Color(0,0,0);
         return;
     }
-    
+   
     float *thit = new float(INFINITY);
     Intersection *in = new Intersection();
     if (intersect(ray, thit, in)) {
@@ -182,8 +182,7 @@ Color Scene::findColor(Intersection *in) {
                 lightColor;
             }*/
             
-            if (!intersectP(shadowRay, in->shape)) {
-            //if (true){
+            if (!shadow) {
                 Color pointColor = computePointLight(direction,
                                                lightColor,
                                                normal,

@@ -10,7 +10,7 @@ CC = g++
 
 # define any compile-time flags
 # CFLAGS = -Wall -g -O3 -Wc++11-extensions
-CFLAGS = -g -DGL_GLEXT_PROTOTYPES -DGL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED -DOSX -Wno-deprecated-register -Wno-deprecated-declarations -Wno-shift-op-parentheses -Wc++11-extensions
+CFLAGS = -g -DGL_GLEXT_PROTOTYPES -DGL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED -DOSX -Wno-deprecated-register -Wno-deprecated-declarations -Wno-shift-op-parentheses -std=c++11
 
 # define any directories containing header files other than /usr/include
 #

@@ -14,15 +14,15 @@ public:
     // vertices
     int max_vertices = 0;
     vec3 vertices[1000000];
-    int current_vertex = 0;
-    int maxdepth = 0;
-    float attenuation[3] = {1,0,0};
+    int num_vertexes = 0;
+
+    int maxdepth = 5;   // The maximum depth (number of bounces) for a ray
+    float attenuation[3] = {1,0,0};   // const linear quadratic
     
     Shape** shapes;
     Light** lights;
-    
-    Camera* camera = new Camera(vec3(),vec3(),vec3(),0);
-    
+    Camera* camera;
+     
     Scene(int _w, int _h)
     {
         w = _w;

@@ -23,24 +23,23 @@ int main(int argc, const char * argv[]) {
     
     Sampler sampler = Sampler(scene->w,scene->h);
     Film film = Film(scene->w,scene->h);
-    
+   
     Color black = Color(0, 0, 0);
     Color *color = new Color(0,0,0);
     
     Ray *ray = new Ray(vec3(0,0,0), vec3(0,0,0), 0, 0, 100);
     
     printf("start rendering.. objects count: %d lights count: %d \n", scene->num_objects, scene->num_lights);
-    //auto t = std::time(nullptr);
-    //auto tm = *std::localtime(&t);
-    //std::cout << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
-
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    std::cout << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
     
     while (sampler.getSample(sample)) {
         film.commit(*sample, black); // default black
-        // generate ray
+        // generate ray, change direction
         scene->camera->generateRay(*sample, ray, film);
-        
-        scene->rayTrace(*ray, 0,color);
+      
+        scene->rayTrace(*ray, 0, color);
         film.commit(*sample, *color);
         
     }

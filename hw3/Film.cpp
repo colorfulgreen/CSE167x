@@ -32,7 +32,8 @@ void Film::commit(Sample sample, Color color){
     int i = y * w + x;
     
     int j = i * 3; // starting element
-    
+   
+    // TODO
     color.clamp();
     
     // free image using BGR order

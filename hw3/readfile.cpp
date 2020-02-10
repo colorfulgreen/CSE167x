@@ -73,13 +73,10 @@ void readfile(const char* filename, Scene *scene)
                         vec3 lookFrom = vec3(values[0], values[1], values[2]);
                         vec3 lookAt = vec3(values[3], values[4], values[5]);
                         vec3 up = vec3(values[6], values[7], values[8]);
-
-                        scene->camera->lookFrom = lookFrom;
-                        scene->camera->lookAt = lookAt;
-                        scene->camera->fovy = values[9];
                         vec3 zvec = lookFrom - lookAt;
-                        scene->camera->up = Transform::upvector(up, zvec);
-                        
+                        up = Transform::upvector(up, zvec);
+
+                        scene->camera = new Camera(lookFrom, lookAt, up, values[9]);
                         scene->camera->setCoord();
                     }
                 }else if(cmd == "diffuse"){
@@ -163,11 +160,11 @@ void readfile(const char* filename, Scene *scene)
                 }
                 else if (cmd == "vertex"){
                     validinput = readvals(s, 3, values);
-                    if (scene->current_vertex >= scene->max_vertices){
+                    if (scene->num_vertexes >= scene->max_vertices){
                         printf("max number of vertices reached\n");
                     }else{
-                        scene->vertices[scene->current_vertex] = vec3(values[0], values[1], values[2]);
-                        scene->current_vertex += 1;
+                        scene->vertices[scene->num_vertexes] = vec3(values[0], values[1], values[2]);
+                        scene->num_vertexes += 1;
                     }
                 }
                 
